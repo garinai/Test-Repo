@@ -6,16 +6,28 @@ repos:
         stages: [commit]
       - id: trailing-whitespace
         stages: [commit]
+-   repo: local
+    hooks:
+      - id: isort
+        name: Sorting import statements
+        entry: bash -c 'isort "$@"; git add -u' --
+        language: python
+        args: ["--filter-files"]
+        files: \.py$
 -   repo: https://github.com/pre-commit/mirrors-autopep8
     rev: v1.6.0
     hooks:
     -   id: autopep8
+        language: python
+        types: [python]
         stages: [push]
 
 -   repo: https://github.com/pre-commit/mirrors-yapf
     rev: v0.32.0
     hooks:
     -   id: yapf
+        language: python
+        types: [python]
         stages: [push]
         args:
           - "--style={based_on_style: yapf, COLUMN_LIMIT: 70, INDENT_DICTIONARY_VALUE:true,DISABLE_ENDING_COMMA_HEURISTIC:true,indent_width: 2,CONTINUATION_INDENT_WIDTH:4, CONTINUATION_ALIGN_STYLE:'FIXED',BLANK_LINES_BETWEEN_TOP_LEVEL_IMPORTS_AND_VARIABLES:2, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION:3,ARITHMETIC_PRECEDENCE_INDICATION:true,BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF:false,SPACES_BEFORE_COMMENT:5}"
