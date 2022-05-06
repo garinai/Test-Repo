@@ -1,0 +1,37 @@
+name: pull action
+on: pull_request
+jobs:
+  autopep8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - name: autopep8
+        id: autopep8
+        uses: peter-evans/autopep8@v1
+        with:
+          args: --exit-code --recursive --in-place --aggressive --aggressive .
+      - name: Set autopep8 branch name
+        id: vars
+        run: echo ::set-output name=branch-name::"autopep8-patches/${{ github.head_ref }}"
+      - name: autoyapf
+        id: autoyapf
+        uses: mritunjaysharma394/autoyapf@v2
+        with:
+            args: --recursive --in-place "--style={based_on_style: yapf, COLUMN_LIMIT: 70, INDENT_DICTIONARY_VALUE:true,DISABLE_ENDING_COMMA_HEURISTIC:true,indent_width: 2,CONTINUATION_INDENT_WIDTH:4, CONTINUATION_ALIGN_STYLE:'FIXED',BLANK_LINES_BETWEEN_TOP_LEVEL_IMPORTS_AND_VARIABLES:2, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION:3,ARITHMETIC_PRECEDENCE_INDICATION:true,BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF:false,SPACES_BEFORE_COMMENT:5}" .
+      - name: Check for modified files
+        id: git-check
+        run: echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
+      - name: Create Pull Request
+        if: steps.autopep8.outputs.exit-code == 2
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: autopep8 action fixes
+          title: Fixes by autopep8 action
+          body: This is an auto-generated PR with fixes by autopep8.
+          labels: autopep8, automated pr
+          branch: ${{ steps.vars.outputs.branch-name }}
+      # - name: Fail if autopep8 made changes
+      #   if: steps.autopep8.outputs.exit-code == 2
+      #   run: exit 1
