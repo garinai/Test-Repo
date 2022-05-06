@@ -3,9 +3,9 @@ repos:
     rev: v4.2.0
     hooks:
       - id: end-of-file-fixer
-        stages: [push]
+        stages: [commit]
       - id: trailing-whitespace
-        stages: [push]
+        stages: [commit]
 -   repo: local
     hooks:
       - id: isort

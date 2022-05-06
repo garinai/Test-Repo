@@ -21,3 +21,5 @@ class Example3(   object ):
 Only actual code should be reindented.
 """
                     return (sys.path, some_string)
+
+asdf
